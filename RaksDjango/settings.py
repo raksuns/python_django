@@ -24,17 +24,28 @@ SECRET_KEY = 'aem0oz$=(ow36)jhue0_wnj@p2zh7eo=nt5ij+)m)qeno3gdjb'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+ADMINS = (
+	('raks', 'iraks@myhost.com'),
+)
+
+MANAGERS = ADMINS
+
 ALLOWED_HOSTS = []
 
 # Application definition
 
 INSTALLED_APPS = [
-	'django.contrib.admin',
 	'django.contrib.auth',
 	'django.contrib.contenttypes',
 	'django.contrib.sessions',
 	'django.contrib.messages',
 	'django.contrib.staticfiles',
+	'django.contrib.admin',
+
+	'django_mongoengine',
+	'django_mongoengine.mongo_auth',
+	'django_mongoengine.mongo_admin.sites',
+	'django_mongoengine.mongo_admin'
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -68,6 +79,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'RaksDjango.wsgi.application'
 
+MONGODB_DATABASES = {
+	"default": {
+		"name": "iraks",
+		"host": "127.0.0.1",
+		"password": "123qwe!@#",
+		"username": "iraks",
+		"tz_aware": True, # if you using timezones in django (USE_TZ = True)
+	},
+}
+
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 
@@ -77,17 +98,8 @@ DATABASES = {
 	},
 }
 
-MONGODB_DATABASES = {
-	"default": {
-		"name": "iraks",
-		"host": "127.0.0.1",
-		"password": "123qwe",
-		"username": "iraks",
-		"tz_aware": True, # if you using timezones in django (USE_TZ = True)
-	},
-}
 
-INSTALLED_APPS += ["django_mongoengine"]
+
 
 # Password validation
 # https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
@@ -106,6 +118,13 @@ AUTH_PASSWORD_VALIDATORS = [
 		'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
 	},
 ]
+
+PASSWORD_HASHERS = (
+	'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+	'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+	'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+	'django.contrib.auth.hashers.BCryptPasswordHasher'
+)
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
@@ -129,3 +148,14 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
+AUTH_USER_MODEL = 'mongo_auth.MongoUser'
+
+AUTHENTICATION_BACKENDS = (
+	'django_mongoengine.mongo_auth.backends.MongoEngineBackend',
+)
+
+SESSION_ENGINE = 'django_mongoengine.sessions'
+SESSION_SERIALIZER = 'django_mongoengine.sessions.BSONSerializer'
+
+
